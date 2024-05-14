@@ -2,6 +2,7 @@ import yfinance as yf
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
+import streamlit as st
 
 # Función para calcular el portafolio
 def calcular_portafolio():
@@ -48,13 +49,24 @@ def calcular_portafolio():
         return rendimiento_esperado, volatilidad, pesos_optimos, rendimiento_optimo, volatilidad_optima
 
     except Exception as e:
-        print("Ocurrió un error:", e)
+        st.error(f"Ocurrió un error: {e}")
         return None, None, None, None, None
 
 # Función para generar y guardar los gráficos como archivos PNG
 def generate_and_save_plots():
     # Calcular el portafolio óptimo y obtener los datos necesarios
     rendimiento_esperado, volatilidad, pesos_optimos, rendimiento_optimo, volatilidad_optima = calcular_portafolio()
+
+    if rendimiento_esperado is None or volatilidad is None or pesos_optimos is None:
+        st.error("No se pudo calcular el portafolio óptimo.")
+        return
+
+    # Verificación y depuración
+    st.write("Tipo de rendimiento_esperado:", type(rendimiento_esperado))
+    st.write("Contenido de rendimiento_esperado:", rendimiento_esperado)
+    st.write("Tipo de volatilidad:", type(volatilidad))
+    st.write("Contenido de volatilidad:", volatilidad)
+    st.write("Pesos óptimos:", pesos_optimos)
 
     # Convertir pesos_optimos a un DataFrame de pandas para usar el índice
     df_pesos_optimos = pd.DataFrame(pesos_optimos, index=rendimiento_esperado.index, columns=['Ponderacion'])
@@ -99,4 +111,4 @@ def generate_and_save_plots():
 # Generar y guardar los gráficos
 generate_and_save_plots()
 
-print("Gráficos guardados como archivos PNG.")
+st.write("Gráficos guardados como archivos PNG.")
